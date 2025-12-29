@@ -1,14 +1,17 @@
 package com.wallet.instrument_service.model;
 
 import com.wallet.instrument_service.dto.InstrumentDTO;
+import com.wallet.instrument_service.dto.TickerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "instrument")
 @Getter
+@NoArgsConstructor
 public class Instrument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,5 +53,15 @@ public class Instrument {
         this.market = request.market();
         this.assetType = request.asset_type();
         this.cik = request.cik();
+    }
+    public Instrument(TickerDTO tickerDTO){
+        this.ticker = tickerDTO.ticker();
+        this.name = tickerDTO.name();
+        this.exchange = tickerDTO.primary_exchange();
+        this.country = tickerDTO.locale();
+        this.currency = tickerDTO.currency_name();
+        this.market = tickerDTO.market();
+        this.assetType = tickerDTO.type();
+        this.cik = tickerDTO.cik();
     }
 }

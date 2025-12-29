@@ -28,5 +28,16 @@ public class InstrumentController {
         List<InstrumentDTO> instruments = instrumentService.getAllInstruments();
         return ResponseEntity.ok(instruments);
     }
+    @GetMapping("/fetch")
+    public ResponseEntity<Void> fetchInstruments(){
+        instrumentService.fetchInstruments();
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteInstruments(){
+        instrumentService.deleteInstruments();
+        return ResponseEntity.ok().build();
+    }
 }
 
