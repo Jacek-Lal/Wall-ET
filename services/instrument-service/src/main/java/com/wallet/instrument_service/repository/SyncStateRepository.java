@@ -8,8 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface SyncStateRepository extends JpaRepository<SyncState, Integer> {
-    SyncState findTopByOrderByIdDesc();
-
     @Query("""
             SELECT s FROM SyncState s
             WHERE s.sortBy = :sort AND s.sortDir = :order

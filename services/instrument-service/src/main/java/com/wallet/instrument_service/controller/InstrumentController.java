@@ -31,9 +31,13 @@ public class InstrumentController {
         return ResponseEntity.ok(instruments);
     }
     @PostMapping("/import")
-    public ResponseEntity<Void> fetchInstruments(@RequestParam String sort,
-                                                 @RequestParam String order,
-                                                 @RequestParam int limit){
+    public ResponseEntity<Void> fetchInstruments(@RequestParam @NotBlank String sort,
+                                                 @RequestParam @NotBlank String order,
+                                                 @RequestParam @Min(1) @Max(1000) int limit){
+
+        if (!order.equalsIgnoreCase("asc") && !order.equalsIgnoreCase("desc"))
+            throw new IllegalArgumentException("Invalid order parameter. Use 'asc' or 'desc'");
+
         importService.fetchInstruments(sort, order, limit);
         return ResponseEntity.ok().build();
     }
