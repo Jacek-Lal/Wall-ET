@@ -1,35 +1,21 @@
 package com.wallet.instrument_service.service;
 
 import com.wallet.instrument_service.dto.InstrumentDTO;
-import com.wallet.instrument_service.dto.TickerApiResponse;
 import com.wallet.instrument_service.model.Instrument;
-import com.wallet.instrument_service.model.SyncState;
 import com.wallet.instrument_service.repository.InstrumentRepository;
-import com.wallet.instrument_service.repository.SyncStateRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @Service
+@Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 @Slf4j
 public class InstrumentService {
 
     private final InstrumentRepository instrumentRepository;
-    private final SyncStateRepository syncStateRepository;
-    private final InstrumentImportService importService;
-
-    @Value("${app.ticker-api.key}") String API_KEY;
-    @Value("${app.ticker-api.url}") String API_URL;
 
     public void createInstrument(InstrumentDTO request) {
         Instrument instrument = new Instrument(request);
@@ -50,62 +36,6 @@ public class InstrumentService {
                         instrument.getCik()
                 ))
                 .toList();
-    }
-
-    public void fetchInstruments(){
-
-        String uri, sort, order;
-        int limit;
-
-        SyncState lastState = syncStateRepository.findTopByOrderByIdDesc();
-
-        if (lastState != null){
-            uri = lastState.getNextUrl() + "&apiKey=" + API_KEY;
-            sort = lastState.getSortBy();
-            order = lastState.getSortDir();
-        } else {
-            sort = "primary_exchange";
-            order = "asc";
-            limit = 1000;
-
-            uri = API_URL +
-                    "?active=true" +
-                    "&order=" + order +
-                    "&limit=" + limit +
-                    "&sort=" + sort +
-                    "&apiKey=" + API_KEY;
-        }
-
-        String jsonResponse = "";
-
-        try (HttpClient client = HttpClient.newHttpClient()){
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
-            jsonResponse = httpResponse.body();
-            log.info("Instruments fetched successfully");
-        } catch (Exception e){
-            log.error("Error fetching instruments: {}", e.getMessage());
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        TickerApiResponse response = mapper.readValue(jsonResponse, TickerApiResponse.class);
-
-        SyncState state = new SyncState(response.count(), order, sort, response.next_url());
-        syncStateRepository.save(state);
-        log.info("Sync state saved");
-
-        List<Instrument> instruments = response
-                .results()
-                .stream()
-                .map(Instrument::new)
-                .toList();
-
-        importService.upsertIgnoreDuplicates(instruments);
-        log.info("{} Instruments saved to database successfully", instruments.size());
     }
 
     public void deleteInstruments() {

@@ -1,6 +1,7 @@
 package com.wallet.instrument_service.controller;
 
 import com.wallet.instrument_service.dto.InstrumentDTO;
+import com.wallet.instrument_service.service.InstrumentImportService;
 import com.wallet.instrument_service.service.InstrumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class InstrumentController {
 
     private final InstrumentService instrumentService;
+    private final InstrumentImportService importService;
 
     @PostMapping
     public ResponseEntity<Void> createInstrument(@RequestBody @Valid InstrumentDTO request){
@@ -28,9 +30,11 @@ public class InstrumentController {
         List<InstrumentDTO> instruments = instrumentService.getAllInstruments();
         return ResponseEntity.ok(instruments);
     }
-    @GetMapping("/fetch")
-    public ResponseEntity<Void> fetchInstruments(){
-        instrumentService.fetchInstruments();
+    @PostMapping("/import")
+    public ResponseEntity<Void> fetchInstruments(@RequestParam String sort,
+                                                 @RequestParam String order,
+                                                 @RequestParam int limit){
+        importService.fetchInstruments(sort, order, limit);
         return ResponseEntity.ok().build();
     }
 
