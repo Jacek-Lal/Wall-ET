@@ -3,7 +3,9 @@ package com.wallet.instrument_service.service;
 import com.wallet.instrument_service.dto.InstrumentDTO;
 import com.wallet.instrument_service.dto.TickerApiResponse;
 import com.wallet.instrument_service.model.Instrument;
+import com.wallet.instrument_service.model.SyncState;
 import com.wallet.instrument_service.repository.InstrumentRepository;
+import com.wallet.instrument_service.repository.SyncStateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,9 @@ import java.util.List;
 public class InstrumentService {
 
     private final InstrumentRepository instrumentRepository;
+    private final SyncStateRepository syncStateRepository;
+    private final InstrumentImportService importService;
+
     @Value("${app.ticker-api.key}") String API_KEY;
     @Value("${app.ticker-api.url}") String API_URL;
 
@@ -48,12 +53,28 @@ public class InstrumentService {
     }
 
     public void fetchInstruments(){
-        String uri = API_URL +
-                "?active=true" +
-                "&order=asc" +
-                "&limit=1000" +
-                "&sort=primary_exchange" +
-                "&apiKey=" + API_KEY;
+
+        String uri, sort, order;
+        int limit;
+
+        SyncState lastState = syncStateRepository.findTopByOrderByIdDesc();
+
+        if (lastState != null){
+            uri = lastState.getNextUrl() + "&apiKey=" + API_KEY;
+            sort = lastState.getSortBy();
+            order = lastState.getSortDir();
+        } else {
+            sort = "primary_exchange";
+            order = "asc";
+            limit = 1000;
+
+            uri = API_URL +
+                    "?active=true" +
+                    "&order=" + order +
+                    "&limit=" + limit +
+                    "&sort=" + sort +
+                    "&apiKey=" + API_KEY;
+        }
 
         String jsonResponse = "";
 
@@ -72,13 +93,18 @@ public class InstrumentService {
 
         ObjectMapper mapper = new ObjectMapper();
         TickerApiResponse response = mapper.readValue(jsonResponse, TickerApiResponse.class);
+
+        SyncState state = new SyncState(response.count(), order, sort, response.next_url());
+        syncStateRepository.save(state);
+        log.info("Sync state saved");
+
         List<Instrument> instruments = response
                 .results()
                 .stream()
                 .map(Instrument::new)
                 .toList();
 
-        instrumentRepository.saveAll(instruments);
+        importService.upsertIgnoreDuplicates(instruments);
         log.info("{} Instruments saved to database successfully", instruments.size());
     }
 
