@@ -46,7 +46,6 @@ public class InstrumentImportService {
         String json = fetchJson(uri);
         TickerApiResponse response = parseResponse(json);
 
-        importTx.deleteSyncState(lastState);
         importTx.saveSyncState(response.count(), request.order(), request.sort(), response.next_url());
 
         List<Instrument> instruments = response
