@@ -3,13 +3,14 @@ package com.wallet.instrument_service.service;
 import com.wallet.instrument_service.dto.InstrumentDTO;
 import com.wallet.instrument_service.model.Instrument;
 import com.wallet.instrument_service.repository.InstrumentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
+@Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
 @Slf4j
 public class InstrumentService {
@@ -35,5 +36,10 @@ public class InstrumentService {
                         instrument.getCik()
                 ))
                 .toList();
+    }
+
+    public void deleteInstruments() {
+        instrumentRepository.deleteAll();
+        log.info("Instruments wiped");
     }
 }

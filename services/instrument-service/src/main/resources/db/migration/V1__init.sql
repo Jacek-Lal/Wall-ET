@@ -23,7 +23,7 @@ CREATE INDEX ix_instrument_name_lower
 CREATE TABLE instrument_sync_state (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     items INT NOT NULL check (items > 0),
-    sort_dir CHAR(4) NOT NULL check (sort_dir IN ('asc', 'desc')),
+    sort_dir VARCHAR(4) NOT NULL check (sort_dir IN ('asc', 'desc')),
     sort_by TEXT NOT NULL,
     next_url TEXT NOT NULL UNIQUE
 );

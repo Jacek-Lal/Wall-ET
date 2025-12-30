@@ -23,3 +23,8 @@ management:
     web:
       exposure:
         include: health,info
+
+app:
+  ticker-api:
+    url: https://api.massive.com/v3/reference/tickers
+    key: ${TICKER_API_KEY}
