@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +26,9 @@ public class InstrumentImportService {
     private final SyncStateRepository stateRepository;
     private final InstrumentImportTx importTx;
     private final ObjectMapper objectMapper;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     @Value("${app.ticker-api.key}") String API_KEY;
     @Value("${app.ticker-api.url}") String API_URL;
@@ -77,7 +80,11 @@ public class InstrumentImportService {
     }
 
     private String fetchJson(URI uri) {
-        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(10))
+                .uri(uri)
+                .GET()
+                .build();
 
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
