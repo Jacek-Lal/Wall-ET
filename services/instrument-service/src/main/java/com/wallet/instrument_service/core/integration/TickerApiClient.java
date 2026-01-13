@@ -1,30 +1,24 @@
-package com.wallet.instrument_service.service;
+package com.wallet.instrument_service.core.integration;
 
-import com.wallet.instrument_service.dto.TickerDTO;
-import com.wallet.instrument_service.model.Instrument;
-import com.wallet.instrument_service.model.SyncState;
-import com.wallet.instrument_service.repository.SyncStateRepository;
+import com.wallet.instrument_service.core.integration.dto.TickerApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.databind.ObjectMapper;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class InstrumentImportService {
+public class TickerApiClient {
 
-    private final SyncStateRepository stateRepository;
-    private final InstrumentImportTx importTx;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -33,31 +27,16 @@ public class InstrumentImportService {
     @Value("${app.ticker-api.key}") String API_KEY;
     @Value("${app.ticker-api.url}") String API_URL;
 
-    public void fetchInstruments(String sort, String order, int limit){
-        log.info("Instruments import started with: sort = {}, order = {}", sort, order);
-        SyncState lastState = stateRepository.findLastStateBySortAndDir(sort, order).orElse(null);
-
-        FetchRequest request = lastState == null ?
+    public TickerApiResponse fetchPage(String sort, String order, int limit, String nextUrl){
+        FetchRequest request = nextUrl == null ?
                 FetchRequest.initial(sort, order, limit) :
-                FetchRequest.next(lastState.getNextUrl(), lastState.getSortBy(), lastState.getSortDir());
+                FetchRequest.next(nextUrl);
 
         URI uri = buildUri(request);
 
         String json = fetchJson(uri);
-        TickerApiResponse response = parseResponse(json);
 
-        importTx.saveSyncState(response.count(), request.order(), request.sort(), response.next_url());
-
-        List<Instrument> instruments = response
-                .results()
-                .stream()
-                .map(Instrument::new)
-                .toList();
-
-        int[][] results = importTx.upsertIgnoreDuplicates(instruments);
-        int inserted = Arrays.stream(results).flatMapToInt(Arrays::stream).sum();
-        log.info("Import finished: fetched={}, inserted={}, skipped={}",
-                instruments.size(), inserted, instruments.size() - inserted);
+        return parseResponse(json);
     }
 
     private URI buildUri(FetchRequest req) {
@@ -109,12 +88,9 @@ public class InstrumentImportService {
         static FetchRequest initial(String sort, String order, int limit){
             return new FetchRequest(null, sort, order, limit);
         }
-        static FetchRequest next(String nextUrl, String sort, String order){
-            return new FetchRequest(nextUrl, sort, order, null);
+        static FetchRequest next(String nextUrl){
+            return new FetchRequest(nextUrl, null, null, null);
         }
     }
-
-    private record TickerApiResponse(List<TickerDTO> results, String status, String request_id,
-                                     int count, String next_url) {}
 }
 

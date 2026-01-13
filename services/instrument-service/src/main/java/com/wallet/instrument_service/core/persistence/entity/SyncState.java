@@ -1,4 +1,4 @@
-package com.wallet.instrument_service.model;
+package com.wallet.instrument_service.core.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

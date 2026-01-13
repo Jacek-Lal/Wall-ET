@@ -1,6 +1,6 @@
-package com.wallet.instrument_service.repository;
+package com.wallet.instrument_service.core.persistence.repo;
 
-import com.wallet.instrument_service.model.SyncState;
+import com.wallet.instrument_service.core.persistence.entity.SyncState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

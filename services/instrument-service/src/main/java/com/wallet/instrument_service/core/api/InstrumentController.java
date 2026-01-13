@@ -1,8 +1,8 @@
-package com.wallet.instrument_service.controller;
+package com.wallet.instrument_service.core.api;
 
-import com.wallet.instrument_service.dto.InstrumentDTO;
-import com.wallet.instrument_service.service.InstrumentImportService;
-import com.wallet.instrument_service.service.InstrumentService;
+import com.wallet.instrument_service.core.api.dto.InstrumentCreateRequest;
+import com.wallet.instrument_service.core.service.InstrumentImportService;
+import com.wallet.instrument_service.core.service.InstrumentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -23,14 +23,14 @@ public class InstrumentController {
     private final InstrumentImportService importService;
 
     @PostMapping
-    public ResponseEntity<Void> createInstrument(@RequestBody @Valid InstrumentDTO request){
+    public ResponseEntity<Void> createInstrument(@RequestBody @Valid InstrumentCreateRequest request){
         instrumentService.createInstrument(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<InstrumentDTO>> getAllInstruments() {
-        List<InstrumentDTO> instruments = instrumentService.getAllInstruments();
+    public ResponseEntity<List<InstrumentCreateRequest>> getAllInstruments() {
+        List<InstrumentCreateRequest> instruments = instrumentService.getAllInstruments();
         return ResponseEntity.ok(instruments);
     }
     @PostMapping("/import")

@@ -1,12 +1,13 @@
-package com.wallet.instrument_service.service;
+package com.wallet.instrument_service.core.service;
 
-import com.wallet.instrument_service.dto.InstrumentDTO;
-import com.wallet.instrument_service.model.Instrument;
-import com.wallet.instrument_service.repository.InstrumentRepository;
+import com.wallet.instrument_service.core.api.dto.InstrumentCreateRequest;
+import com.wallet.instrument_service.core.persistence.entity.Instrument;
+import com.wallet.instrument_service.core.persistence.repo.InstrumentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -17,15 +18,15 @@ public class InstrumentService {
 
     private final InstrumentRepository instrumentRepository;
 
-    public void createInstrument(InstrumentDTO request) {
+    public void createInstrument(InstrumentCreateRequest request) {
         Instrument instrument = new Instrument(request);
         instrumentRepository.save(instrument);
     }
 
-    public List<InstrumentDTO> getAllInstruments() {
+    public List<InstrumentCreateRequest> getAllInstruments() {
         List<Instrument> instruments = instrumentRepository.findAll();
         return instruments.stream()
-                .map(instrument -> new InstrumentDTO(
+                .map(instrument -> new InstrumentCreateRequest(
                         instrument.getTicker(),
                         instrument.getName(),
                         instrument.getExchange(),

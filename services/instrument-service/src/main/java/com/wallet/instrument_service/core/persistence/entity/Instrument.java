@@ -1,7 +1,7 @@
-package com.wallet.instrument_service.model;
+package com.wallet.instrument_service.core.persistence.entity;
 
-import com.wallet.instrument_service.dto.InstrumentDTO;
-import com.wallet.instrument_service.dto.TickerDTO;
+import com.wallet.instrument_service.core.api.dto.InstrumentCreateRequest;
+import com.wallet.instrument_service.core.integration.dto.TickerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +44,7 @@ public class Instrument {
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    public Instrument(InstrumentDTO request) {
+    public Instrument(InstrumentCreateRequest request) {
         this.ticker = request.ticker();
         this.name = request.name();
         this.exchange = request.exchange();
