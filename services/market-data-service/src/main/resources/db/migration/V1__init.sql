@@ -1,5 +1,5 @@
 CREATE TABLE prices_daily (
-  instrument_id BIGINT NOT NULL,
+  ticker        TEXT NOT NULL,
   day           DATE NOT NULL,
 
   open          NUMERIC(20, 8),
@@ -8,19 +8,19 @@ CREATE TABLE prices_daily (
   close         NUMERIC(20, 8) NOT NULL,
   volume        NUMERIC(20, 2),
 
-  currency      CHAR(3) NOT NULL,
+  currency      VARCHAR(3) NOT NULL,
   source        TEXT NOT NULL,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
 
-  PRIMARY KEY (instrument_id, day)
+  PRIMARY KEY (ticker, day)
 );
 
-CREATE INDEX ix_prices_daily_instrument_day_desc
-  ON prices_daily (instrument_id, day DESC);
+CREATE INDEX ix_prices_daily_ticker_day_desc
+  ON prices_daily (ticker, day DESC);
 
 CREATE TABLE fx_rates_daily (
-  base_currency  CHAR(3) NOT NULL,
-  quote_currency CHAR(3) NOT NULL,
+  base_currency  VARCHAR(3) NOT NULL,
+  quote_currency VARCHAR(3) NOT NULL,
   day            DATE NOT NULL,
   rate           NUMERIC(20, 10) NOT NULL,
 
