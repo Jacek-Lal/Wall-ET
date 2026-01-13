@@ -1,4 +1,4 @@
-package com.wallet.instrument_service.dto;
+package com.wallet.instrument_service.core.integration.dto;
 
 public record TickerDTO(
         String ticker,

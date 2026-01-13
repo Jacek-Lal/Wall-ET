@@ -1,10 +1,10 @@
-package com.wallet.instrument_service.dto;
+package com.wallet.instrument_service.core.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record InstrumentDTO(
+public record InstrumentCreateRequest(
         @NotBlank String ticker,
         @NotBlank String name,
         @NotBlank String exchange,
