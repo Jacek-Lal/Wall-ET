@@ -1,25 +1,28 @@
-package com.wallet.market_data_service.model;
+package com.wallet.market_data_service.core.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "prices_daily")
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TickerPrice {
 
     @Embeddable
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Id implements Serializable {
         private String ticker;
-        private Date day;
+        private LocalDate day;
     }
 
     @EmbeddedId
@@ -33,12 +36,13 @@ public class TickerPrice {
     private BigDecimal close;
     private BigDecimal volume;
 
-    @Column(length = 3)
-    private String currency;
-
-    @Column(nullable = false)
-    private String source;
-
-    @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    public TickerPrice(String ticker, LocalDate day, BigDecimal open, BigDecimal high,
+                       BigDecimal low, BigDecimal close, BigDecimal volume){
+        this.id = new Id(ticker, day);
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.volume = volume;
+    }
 }

@@ -6,11 +6,7 @@ CREATE TABLE prices_daily (
   high          NUMERIC(20, 8),
   low           NUMERIC(20, 8),
   close         NUMERIC(20, 8) NOT NULL,
-  volume        NUMERIC(20, 2),
-
-  currency      VARCHAR(3) NOT NULL,
-  source        TEXT NOT NULL,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  volume        NUMERIC(38, 10),
 
   PRIMARY KEY (ticker, day)
 );
