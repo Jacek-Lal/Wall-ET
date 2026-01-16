@@ -2,6 +2,7 @@ package com.wallet.instrument_service.core.service;
 
 import com.wallet.instrument_service.core.integration.TickerApiClient;
 import com.wallet.instrument_service.core.integration.dto.TickerApiResponse;
+import com.wallet.instrument_service.core.persistence.dao.InstrumentSyncWriter;
 import com.wallet.instrument_service.core.persistence.entity.Instrument;
 import com.wallet.instrument_service.core.persistence.entity.SyncState;
 import com.wallet.instrument_service.core.persistence.repo.SyncStateRepository;

@@ -1,4 +1,4 @@
-package com.wallet.instrument_service.core.service;
+package com.wallet.instrument_service.core.persistence.dao;
 
 import com.wallet.instrument_service.core.persistence.entity.Instrument;
 import com.wallet.instrument_service.core.persistence.entity.SyncState;
