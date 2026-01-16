@@ -15,6 +15,11 @@ spring:
   flyway:
     enabled: true
 
+logging:
+  level:
+    root: INFO
+    com.example.marketdata: DEBUG
+
 server:
   port: 8083
 
@@ -23,3 +28,7 @@ management:
     web:
       exposure:
         include: health,info
+
+stooq:
+  api:
+    base-url: https://stooq.com/q/d/l/
