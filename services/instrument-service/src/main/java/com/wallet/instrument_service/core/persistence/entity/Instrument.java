@@ -1,6 +1,6 @@
 package com.wallet.instrument_service.core.persistence.entity;
 
-import com.wallet.instrument_service.core.api.dto.InstrumentCreateRequest;
+import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.integration.dto.TickerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -46,7 +46,7 @@ public class Instrument {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Instrument(InstrumentCreateRequest request) {
+    public Instrument(InstrumentRequest request) {
         this.ticker = request.ticker();
         this.name = request.name();
         this.exchange = request.exchange();

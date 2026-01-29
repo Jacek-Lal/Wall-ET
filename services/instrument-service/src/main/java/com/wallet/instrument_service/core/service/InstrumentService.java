@@ -1,6 +1,7 @@
 package com.wallet.instrument_service.core.service;
 
-import com.wallet.instrument_service.core.api.dto.InstrumentCreateRequest;
+import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
+import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.persistence.entity.Instrument;
 import com.wallet.instrument_service.core.persistence.repo.InstrumentRepository;
 import jakarta.transaction.Transactional;
@@ -18,15 +19,15 @@ public class InstrumentService {
 
     private final InstrumentRepository instrumentRepository;
 
-    public void createInstrument(InstrumentCreateRequest request) {
-        Instrument instrument = new Instrument(request);
-        instrumentRepository.save(instrument);
+    public InstrumentResponse createInstrument(InstrumentRequest request) {
+        Instrument instrument = instrumentRepository.save(new Instrument(request));
+        return new InstrumentResponse(instrument);
     }
 
-    public List<InstrumentCreateRequest> getAllInstruments() {
+    public List<InstrumentRequest> getAllInstruments() {
         List<Instrument> instruments = instrumentRepository.findAll();
         return instruments.stream()
-                .map(instrument -> new InstrumentCreateRequest(
+                .map(instrument -> new InstrumentRequest(
                         instrument.getTicker(),
                         instrument.getName(),
                         instrument.getExchange(),

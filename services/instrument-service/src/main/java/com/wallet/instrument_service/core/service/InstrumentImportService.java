@@ -1,5 +1,7 @@
 package com.wallet.instrument_service.core.service;
 
+import com.wallet.instrument_service.core.api.enums.OrderDir;
+import com.wallet.instrument_service.core.api.enums.SortBy;
 import com.wallet.instrument_service.core.integration.TickerApiClient;
 import com.wallet.instrument_service.core.integration.dto.TickerApiResponse;
 import com.wallet.instrument_service.core.persistence.dao.InstrumentSyncWriter;
@@ -21,11 +23,11 @@ public class InstrumentImportService {
     private final SyncStateRepository syncStateRepository;
     private final InstrumentSyncWriter writer;
 
-    public void fetchInstruments(String sort, String order, int limit) {
-        SyncState lastState = syncStateRepository.findLastStateBySortAndDir(sort, order).orElse(null);
+    public void fetchInstruments(SortBy sort, OrderDir order, int limit) {
+        SyncState lastState = syncStateRepository.findLastStateBySortAndDir(sort.name(), order.name()).orElse(null);
         String nextUrl = lastState != null ? lastState.getNextUrl() : null;
 
-        TickerApiResponse response = tickerClient.fetchPage(sort, order, limit, nextUrl);
+        TickerApiResponse response = tickerClient.fetchPage(sort.name(), order.name(), limit, nextUrl);
 
         List<Instrument> instruments = response
                 .results()
@@ -33,7 +35,7 @@ public class InstrumentImportService {
                 .map(Instrument::new)
                 .toList();
 
-        SyncState newState = new SyncState(response.count(), order, sort, response.next_url());
+        SyncState newState = new SyncState(response.count(), order.name(), sort.name(), response.next_url());
 
         int inserted = writer.persistPage(instruments, newState);
 
