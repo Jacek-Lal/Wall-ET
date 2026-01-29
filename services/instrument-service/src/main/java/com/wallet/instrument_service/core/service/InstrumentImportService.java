@@ -24,7 +24,9 @@ public class InstrumentImportService {
     private final InstrumentSyncWriter writer;
 
     public void fetchInstruments(SortBy sort, OrderDir order, int limit) {
-        SyncState lastState = syncStateRepository.findLastStateBySortAndDir(sort.name(), order.name()).orElse(null);
+        SyncState lastState = syncStateRepository.findTopBySortByAndSortDirOrderByIdDesc(sort.name(), order.name())
+                .orElse(null);
+
         String nextUrl = lastState != null ? lastState.getNextUrl() : null;
 
         TickerApiResponse response = tickerClient.fetchPage(sort.name(), order.name(), limit, nextUrl);
