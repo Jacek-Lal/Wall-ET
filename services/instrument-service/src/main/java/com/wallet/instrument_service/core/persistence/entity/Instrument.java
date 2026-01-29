@@ -5,8 +5,9 @@ import com.wallet.instrument_service.core.integration.dto.TickerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "instrument")
@@ -15,7 +16,7 @@ import java.time.OffsetDateTime;
 public class Instrument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String ticker;
@@ -41,8 +42,9 @@ public class Instrument {
     @Column
     private String cik;
 
-    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     public Instrument(InstrumentCreateRequest request) {
         this.ticker = request.ticker();
