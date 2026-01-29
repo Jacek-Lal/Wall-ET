@@ -26,5 +26,5 @@ management:
 
 app:
   ticker-api:
-    url: https://api.massive.com/v3/reference/tickers
+    base-url: https://api.massive.com/v3/reference/tickers
     key: ${TICKER_API_KEY}
