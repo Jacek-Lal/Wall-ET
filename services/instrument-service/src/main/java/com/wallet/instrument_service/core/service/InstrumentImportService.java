@@ -31,6 +31,11 @@ public class InstrumentImportService {
 
         TickerApiResponse response = tickerClient.fetchPage(sort.name(), order.name(), limit, nextUrl);
 
+        if (response.count() == 0){
+            log.info("No instruments in response");
+            return;
+        }
+
         List<Instrument> instruments = response
                 .results()
                 .stream()
