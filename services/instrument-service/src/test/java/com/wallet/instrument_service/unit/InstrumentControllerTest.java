@@ -1,4 +1,4 @@
-package com.wallet.instrument_service;
+package com.wallet.instrument_service.unit;
 
 import com.wallet.instrument_service.core.api.InstrumentController;
 import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
