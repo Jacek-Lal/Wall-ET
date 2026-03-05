@@ -167,7 +167,7 @@ pipeline {
         }
         failure {
             withCredentials([string(credentialsId: 'notification-email', variable: 'MAIL_TO')]){
-                mail to: env.MAIL_TO',
+                mail to: env.MAIL_TO,
                 subject: "Pipeline failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Check console output: ${env.BUILD_URL}"
             }
