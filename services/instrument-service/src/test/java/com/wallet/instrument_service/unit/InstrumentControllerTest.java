@@ -5,6 +5,8 @@ import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
+import com.wallet.instrument_service.core.config.TickerClientConfig;
+import com.wallet.instrument_service.core.integration.TickerApiClient;
 import com.wallet.instrument_service.core.service.InstrumentImportService;
 import com.wallet.instrument_service.core.service.InstrumentService;
 import org.hamcrest.Matchers;
@@ -16,6 +18,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,7 +34,10 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(InstrumentController.class)
+@WebMvcTest(value = InstrumentController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = TickerClientConfig.class))
 public class InstrumentControllerTest {
 
     @Autowired MockMvc mockMvc;
