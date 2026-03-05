@@ -23,7 +23,8 @@ pipeline {
                     }
                     post {
                         always {
-                            junit 'services/instrument-service/target/surefire-reports/*.xml'
+                            junit allowEmptyResults: true, 
+                            testResults: 'services/instrument-service/target/surefire-reports/*.xml'
                         }
                     }
                 }
@@ -36,7 +37,8 @@ pipeline {
                     }
                     post {
                         always {
-                            junit 'services/market-data-service/target/surefire-reports/*.xml'
+                            junit allowEmptyResults: true,
+                            testResults: 'services/market-data-service/target/surefire-reports/*.xml'
                         }
                     }
                 }
@@ -49,7 +51,8 @@ pipeline {
                     }
                     post {
                         always {
-                            junit 'services/portfolio-service/target/surefire-reports/*.xml'
+                            junit allowEmptyResults: true,
+                            testResults: 'services/portfolio-service/target/surefire-reports/*.xml'
                         }
                     }
                 }
