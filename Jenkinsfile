@@ -160,14 +160,14 @@ pipeline {
     post {
         success {
             withCredentials([string(credentialsId: 'notification-email', variable: 'MAIL_TO')]){
-                mail to: "${MAIL_TO}",
+                mail to: env.MAIL_TO,
                 subject: "Pipeline succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Build ${env.BUILD_NUMBER} delivered successfully"
             }
         }
         failure {
             withCredentials([string(credentialsId: 'notification-email', variable: 'MAIL_TO')]){
-                mail to: "${MAIL_TO}",
+                mail to: env.MAIL_TO',
                 subject: "Pipeline failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Check console output: ${env.BUILD_URL}"
             }
