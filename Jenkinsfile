@@ -15,7 +15,7 @@ pipeline {
         stage('Build & Test') {
             parallel {
                 stage('instrument-service') {
-                    when { changeset "services/instrument-service/**" }
+                    // when { changeset "services/instrument-service/**" }
                     steps {
                         dir('services/instrument-service') { 
                             sh 'mvn -B clean package' 
@@ -29,7 +29,7 @@ pipeline {
                     }
                 }
                 stage('market-data-service') {
-                    when { changeset "services/market-data-service/**" }
+                    // when { changeset "services/market-data-service/**" }
                     steps {
                         dir('services/market-data-service') { 
                             sh 'mvn -B clean package' 
@@ -43,7 +43,7 @@ pipeline {
                     }
                 }
                 stage('portfolio-service') {
-                    when { changeset "services/portfolio-service/**" }
+                    // when { changeset "services/portfolio-service/**" }
                     steps {
                         dir('services/portfolio-service') {
                             sh 'mvn -B clean package' 
@@ -61,7 +61,7 @@ pipeline {
         stage('Build Docker Images') {
             parallel {
                 stage('instrument-service') {
-                    when { changeset "services/instrument-service/**" }
+                    // when { changeset "services/instrument-service/**" }
                     steps {
                         withCredentials([usernamePassword(
                             credentialsId: 'dockerhub-creds',
@@ -75,7 +75,7 @@ pipeline {
                     }
                 }
                 stage('market-data-service') {
-                    when { changeset "services/market-data-service/**" }
+                    // when { changeset "services/market-data-service/**" }
                     steps {
                         withCredentials([usernamePassword(
                             credentialsId: 'dockerhub-creds',
@@ -89,7 +89,7 @@ pipeline {
                     }
                 }
                 stage('portfolio-service') {
-                    when { changeset "services/portfolio-service/**" }
+                    // when { changeset "services/portfolio-service/**" }
                     steps {
                         withCredentials([usernamePassword(
                             credentialsId: 'dockerhub-creds',
@@ -109,7 +109,7 @@ pipeline {
                 stage('instrument-service') {
                     when { 
                         branch 'main'
-                        changeset "services/instrument-service/**" 
+                        // changeset "services/instrument-service/**" 
                     }
                     steps {
                         withCredentials([usernamePassword(
@@ -126,7 +126,7 @@ pipeline {
                 stage('market-data-service') {
                     when { 
                         branch 'main'
-                        changeset "services/market-data-service/**" 
+                        // changeset "services/market-data-service/**" 
                     }
                     steps {
                         withCredentials([usernamePassword(
@@ -143,7 +143,7 @@ pipeline {
                 stage('portfolio-service') {
                     when { 
                         branch 'main'
-                        changeset "services/portfolio-service/**" 
+                        // changeset "services/portfolio-service/**" 
                     }
                     steps {
                         withCredentials([usernamePassword(
