@@ -34,7 +34,8 @@ public class InstrumentSyncWriter {
 
     private int upsertIgnoreDuplicates(List<Instrument> instruments) {
         String sql = """
-            INSERT INTO instrument (ticker, name, exchange, country, currency, market, asset_type, cik)
+            INSERT INTO instrument 
+            (ticker, name, market, primary_exchange, currency_symbol, base_currency_symbol, type, cik)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (ticker) DO NOTHING
             """;
@@ -42,11 +43,11 @@ public class InstrumentSyncWriter {
         int[][] results = jdbcTemplate.batchUpdate(sql, instruments, 1000, (ps, i) -> {
             ps.setString(1, i.getTicker());
             ps.setString(2, i.getName());
-            ps.setString(3, i.getExchange());
-            ps.setString(4, i.getCountry());
-            ps.setString(5, i.getCurrency());
-            ps.setString(6, i.getMarket());
-            ps.setString(7, i.getAssetType());
+            ps.setString(3, i.getMarket().name());
+            ps.setString(4, i.getPrimaryExchange());
+            ps.setString(5, i.getCurrencySymbol());
+            ps.setString(6, i.getBaseCurrencySymbol());
+            ps.setString(7, i.getType() != null ? i.getType().name() : null);
             ps.setString(8, i.getCik());
         });
 

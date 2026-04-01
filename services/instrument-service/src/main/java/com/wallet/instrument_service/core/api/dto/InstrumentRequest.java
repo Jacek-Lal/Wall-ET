@@ -1,16 +1,20 @@
 package com.wallet.instrument_service.core.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wallet.instrument_service.core.persistence.enums.InstrumentType;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record InstrumentRequest(
         @NotBlank String ticker,
         @NotBlank String name,
-        @NotBlank String exchange,
-        @NotBlank @Size(min = 2, max = 2) String country,
-        @NotBlank @Size(min = 3, max = 3) String currency,
-        @NotBlank String market,
-        String asset_type,
+        @NotNull Market market,
+        @JsonProperty("primary_exchange") String primaryExchange,
+        @JsonProperty("currency_symbol") @Size(min = 3, max = 3) String currencySymbol,
+        @JsonProperty("base_currency_symbol") String baseCurrencySymbol,
+        InstrumentType type,
         @Size(max = 10) @Pattern(regexp = "^[0-9]*$") String cik
 ) {}
