@@ -1,10 +1,11 @@
 package com.wallet.instrument_service.core.persistence.entity;
 
-import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
-import com.wallet.instrument_service.core.integration.dto.TickerDTO;
+import com.wallet.instrument_service.core.persistence.enums.InstrumentType;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -19,51 +20,51 @@ public class Instrument {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String ticker;
 
     @Column(nullable = false)
+    @Setter
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String exchange;
+    @Setter
+    private Market market;
 
-    @Column(nullable = false, length = 2)
-    private String country;
+    @Column(name = "primary_exchange")
+    @Setter
+    private String primaryExchange;
 
-    @Column(nullable = false, length = 3)
-    private String currency;
+    @Column(name = "currency_symbol", length = 3)
+    @Setter
+    private String currencySymbol;
 
-    @Column(nullable = false)
-    private String market;
+    @Column(name = "base_currency_symbol")
+    @Setter
+    private String baseCurrencySymbol;
 
-    @Column(name = "asset_type")
-    private String assetType;
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private InstrumentType type;
 
     @Column
+    @Setter
     private String cik;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Instrument(InstrumentRequest request) {
-        this.ticker = request.ticker();
-        this.name = request.name();
-        this.exchange = request.exchange();
-        this.country = request.country();
-        this.currency = request.currency();
-        this.market = request.market();
-        this.assetType = request.asset_type();
-        this.cik = request.cik();
-    }
-    public Instrument(TickerDTO tickerDTO){
-        this.ticker = tickerDTO.ticker();
-        this.name = tickerDTO.name();
-        this.exchange = tickerDTO.primary_exchange();
-        this.country = tickerDTO.locale();
-        this.currency = tickerDTO.currency_name();
-        this.market = tickerDTO.market();
-        this.assetType = tickerDTO.type();
-        this.cik = tickerDTO.cik();
+    Instrument(String ticker, String name, Market market, String primaryExchange, String currencySymbol,
+                      String baseCurrencySymbol, InstrumentType type, String cik) {
+        this.ticker = ticker;
+        this.name = name;
+        this.market = market;
+        this.primaryExchange = primaryExchange;
+        this.currencySymbol = currencySymbol;
+        this.baseCurrencySymbol = baseCurrencySymbol;
+        this.type = type;
+        this.cik = cik;
     }
 }
