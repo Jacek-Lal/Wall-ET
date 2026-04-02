@@ -4,6 +4,7 @@ import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import com.wallet.instrument_service.core.service.InstrumentImportService;
 import com.wallet.instrument_service.core.service.InstrumentService;
 import jakarta.validation.Valid;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/instruments")
@@ -48,11 +48,12 @@ public class InstrumentController {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<Void> fetchInstruments(@RequestParam SortBy sort,
+    public ResponseEntity<Void> fetchInstruments(@RequestParam Market market,
+                                                 @RequestParam SortBy sort,
                                                  @RequestParam OrderDir order,
                                                  @RequestParam @Min(1) @Max(1000) int limit){
 
-        importService.fetchInstruments(sort, order, limit);
+        importService.fetchInstruments(market, sort, order, limit);
         return ResponseEntity.ok().build();
     }
 

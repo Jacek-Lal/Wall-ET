@@ -1,6 +1,6 @@
 package com.wallet.instrument_service.core.integration;
 
-import com.wallet.instrument_service.core.integration.dto.TickerApiResponse;
+import com.wallet.instrument_service.core.integration.dto.FullResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,34 +20,38 @@ public class TickerApiClient {
 
     @Value("${app.ticker-api.key}") String apiKey;
 
-    public TickerApiResponse fetchPage(String sort, String order, int limit, String nextUrl) {
+    public FullResponse fetch(String market, String sort, String order, int limit) {
         try {
-            if (nextUrl != null && !nextUrl.isBlank()) {
-                URI uri = UriComponentsBuilder.fromUriString(nextUrl)
-                        .replaceQueryParam("apiKey", apiKey)
-                        .build(true)
-                        .toUri();
-
-                return restClient.get()
-                        .uri(uri)
-                        .retrieve()
-                        .body(TickerApiResponse.class);
-            }
-
             return restClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .queryParam("active", "true")
+                            .queryParam("market", market)
                             .queryParam("order", order)
                             .queryParam("limit", limit)
                             .queryParam("sort", sort)
                             .queryParam("apiKey", apiKey)
                             .build())
                     .retrieve()
-                    .body(TickerApiResponse.class);
+                    .body(FullResponse.class);
 
         } catch (RestClientException e) {
-            throw new IllegalStateException("Failed to fetch instruments (sort=%s, order=%s, limit=%d, nextUrl=%s)"
-                    .formatted(sort, order, limit, nextUrl), e);
+            throw new IllegalStateException("Failed to fetch instruments (market=%s, sort=%s, order=%s, limit=%d)"
+                    .formatted(market, sort, order, limit), e);
+        }
+    }
+    public FullResponse fetchNext(String nextUrl){
+        try {
+            URI uri = UriComponentsBuilder.fromUriString(nextUrl)
+                    .replaceQueryParam("apiKey", apiKey)
+                    .build(true)
+                    .toUri();
+
+            return restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(FullResponse.class);
+        } catch (RestClientException e){
+            throw new IllegalStateException("Failed to fetch instruments (nextUrl=%s)".formatted(nextUrl), e);
         }
     }
 }
