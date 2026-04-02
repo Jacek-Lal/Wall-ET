@@ -22,6 +22,7 @@ public class InstrumentImportService {
     private final TickerApiClient tickerClient;
     private final SyncStateRepository syncStateRepository;
     private final InstrumentSyncWriter writer;
+    private final InstrumentMapper instrumentMapper;
 
     public void fetchInstruments(SortBy sort, OrderDir order, int limit) {
         SyncState lastState = syncStateRepository.findTopBySortByAndSortDirOrderByIdDesc(sort.name(), order.name())
@@ -39,7 +40,7 @@ public class InstrumentImportService {
         List<Instrument> instruments = response
                 .results()
                 .stream()
-                .map(Instrument::new)
+                .map(instrumentMapper::toEntity)
                 .toList();
 
         SyncState newState = new SyncState(response.count(), order.name(), sort.name(), response.next_url());

@@ -10,6 +10,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -37,9 +41,10 @@ public class InstrumentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<InstrumentRequest>> getAllInstruments() {
-        List<InstrumentRequest> instruments = instrumentService.getAllInstruments();
-        return ResponseEntity.ok(instruments);
+    public ResponseEntity<Page<InstrumentResponse>> getAllInstruments(
+            @PageableDefault(size = 50, sort = "ticker", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        return ResponseEntity.ok(instrumentService.getInstruments(pageable));
     }
 
     @PostMapping("/import")
