@@ -1,12 +1,13 @@
-package com.wallet.instrument_service.unit;
+package com.wallet.instrument_service.core.api;
 
-import com.wallet.instrument_service.core.api.InstrumentController;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
 import com.wallet.instrument_service.core.config.TickerClientConfig;
-import com.wallet.instrument_service.core.integration.TickerApiClient;
+import com.wallet.instrument_service.core.persistence.enums.InstrumentType;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import com.wallet.instrument_service.core.service.InstrumentImportService;
 import com.wallet.instrument_service.core.service.InstrumentService;
 import org.hamcrest.Matchers;
@@ -20,10 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -40,30 +44,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 classes = TickerClientConfig.class))
 public class InstrumentControllerTest {
 
-    @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
-    @MockitoBean InstrumentService instrumentService;
-    @MockitoBean InstrumentImportService importService;
+    @Autowired
+    private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockitoBean
+    private InstrumentService instrumentService;
+
+    @MockitoBean
+    private InstrumentImportService importService;
 
     @Test
     @DisplayName("Should return 200 and list of all instruments")
     void shouldReturnAllInstruments() throws Exception {
-        List<InstrumentRequest> instruments = List.of(
-                new InstrumentRequest("AAPL", "Apple Inc.", "XNYS",
-                        "US", "USD","stocks","CS", "100300400"),
-                new InstrumentRequest("A", "Agilent Technologies Inc.","XNYS",
-                        "US","USD","stocks","CS", "2010401")
+        Pageable pageable = PageRequest.of(0, 10);
+        List<InstrumentResponse> instruments = List.of(
+                new InstrumentResponse(1L,"AAPL", "Apple Inc.", Market.STOCKS,
+                        "XNYS", "USD",null,
+                        InstrumentType.CS, "100300400", Instant.now()),
+                new InstrumentResponse(2L,"A", "Agilent Technologies Inc.", Market.STOCKS,
+                        "XNYS","USD",null,
+                        InstrumentType.CS, "2010401", Instant.now())
         );
+        Page<InstrumentResponse> page = new PageImpl<>(instruments);
 
-        when(instrumentService.getAllInstruments()).thenReturn(instruments);
+        when(instrumentService.getInstruments(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/instruments"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpectAll(
-                        jsonPath("$", hasSize(2)),
-                        jsonPath("$[0].ticker").value("AAPL"),
-                        jsonPath("$[1].ticker").value("A")
+                        jsonPath("$.content", hasSize(2)),
+                        jsonPath("$.content[0].ticker").value("AAPL"),
+                        jsonPath("$.content[1].ticker").value("A")
                 );
     }
 
@@ -87,18 +100,17 @@ public class InstrumentControllerTest {
                         {
                             "ticker": "AAPL",
                             "name": "Apple Inc.",
-                            "exchange": "XNYS",
-                            "country": "US",
-                            "currency": "USD",
-                            "market": "stocks",
-                            "asset_type": "CS",
+                            "market": "STOCKS",
+                            "primary_exchange": "XNYS",
+                            "currency_symbol": "USD",
+                            "type": "CS",
                             "cik": "100300400"
                         }
                     """;
 
             InstrumentResponse response = new InstrumentResponse(1L, "AAPL", "Apple Inc.",
-                    "XNYS", "US", "USD","stocks","CS", "100300400",
-                    Instant.parse("2026-01-25T18:35:24.00Z"));
+                    Market.STOCKS, "XNYS", "USD", "US",
+                    InstrumentType.CS, "100300400", Instant.parse("2026-01-25T18:35:24.00Z"));
 
             when(instrumentService.createInstrument(any())).thenReturn(response);
 
@@ -110,7 +122,7 @@ public class InstrumentControllerTest {
                             header().exists("Location"),
                             header().string("Location", Matchers.containsString("/api/instruments/1")),
                             jsonPath("$").isNotEmpty(),
-                            jsonPath("$.id").value(1L),
+                            jsonPath("$.id").value(1),
                             jsonPath("$.ticker").value("AAPL")
                     );
         }
@@ -119,31 +131,28 @@ public class InstrumentControllerTest {
         @MethodSource("invalidRequests")
         @DisplayName("Should return 400 Bad Request when invalid instrument data provided")
         void shouldReturnBadRequestWhenInvalidInstrumentData(InstrumentRequest req, String field) throws Exception {
-            mockMvc.perform(post("/api/instruments")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(req)))
-                    .andExpect(status().isBadRequest());
+             mockMvc.perform(post("/api/instruments")
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(objectMapper.writeValueAsString(req)))
+                     .andExpect(status().isBadRequest());
 
-           verifyNoInteractions(instrumentService);
-        }
+            verifyNoInteractions(instrumentService);
+         }
 
         static Stream<Arguments> invalidRequests() {
             InstrumentRequest base = new InstrumentRequest(
-                    "AAPL", "Apple Inc.", "XNYS", "US", "USD", "stocks", "CS", "100300400"
-            );
+                    "AAPL", "Apple Inc.", Market.STOCKS, "XNYS", "USD",
+                    null, InstrumentType.CS, "100300400");
 
             return Stream.of(
-                    Arguments.of(new InstrumentRequest("", base.name(), base.exchange(), base.country(), base.currency(), base.market(), base.asset_type(), base.cik()), "ticker"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), "", base.exchange(), base.country(), base.currency(), base.market(), base.asset_type(), base.cik()), "name"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), "", base.country(), base.currency(), base.market(), base.asset_type(), base.cik()), "exchange"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.exchange(), "U", base.currency(), base.market(), base.asset_type(), base.cik()), "country"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.exchange(), base.country(), "US", base.market(), base.asset_type(), base.cik()), "currency"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.exchange(), base.country(), base.currency(), "", base.asset_type(), base.cik()), "market"),
-                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.exchange(), base.country(), base.currency(), base.market(), base.asset_type(), "ABC"), "cik")
+                    Arguments.of(new InstrumentRequest("", base.name(), base.market(), base.primaryExchange(), base.currencySymbol(), base.baseCurrencySymbol(), base.type(), base.cik()), "ticker"),
+                    Arguments.of(new InstrumentRequest(base.ticker(), "", base.market(), base.primaryExchange(), base.currencySymbol(), base.baseCurrencySymbol(), base.type(), base.cik()), "name"),
+                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), null, base.primaryExchange(), base.currencySymbol(), base.baseCurrencySymbol(), base.type(), base.cik()), "market"),
+                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.market(), base.primaryExchange(), "US", base.baseCurrencySymbol(), base.type(), base.cik()), "currency_symbol"),
+                    Arguments.of(new InstrumentRequest(base.ticker(), base.name(), base.market(), base.primaryExchange(), base.currencySymbol(), base.baseCurrencySymbol(), base.type(), "ABC"), "cik")
             );
         }
     }
-
 
     @Nested
     @DisplayName("Importing instruments data")
@@ -152,17 +161,19 @@ public class InstrumentControllerTest {
         @Test
         @DisplayName("Should return 200 Ok and call import service")
         void shouldReturnOkWhenValidParameters() throws Exception {
-            SortBy sort = SortBy.ticker;
-            OrderDir order = OrderDir.asc;
+            SortBy sort = SortBy.TICKER;
+            OrderDir order = OrderDir.ASC;
+            Market market = Market.STOCKS;
             int limit = 1000;
 
             mockMvc.perform(post("/api/instruments/import")
+                            .queryParam("market", market.name())
                             .queryParam("sort", sort.name())
                             .queryParam("order", order.name())
                             .queryParam("limit", String.valueOf(limit)))
                     .andExpect(status().isOk());
 
-            verify(importService, times(1)).fetchInstruments(sort, order, limit);
+            verify(importService, times(1)).fetchInstruments(market, sort, order, limit);
         }
 
         @ParameterizedTest(name = "invalid param: {3}")
@@ -170,6 +181,7 @@ public class InstrumentControllerTest {
         @DisplayName("Should return 400 Bad Request when invalid parameters and never call import service")
         void shouldReturnBadRequestWhenInvalidParameters(String sort, String order, int limit, String param) throws Exception {
             mockMvc.perform(post("/api/instruments/import")
+                            .queryParam("market", Market.STOCKS.name())
                             .queryParam("sort", sort)
                             .queryParam("order", order)
                             .queryParam("limit", String.valueOf(limit)))
