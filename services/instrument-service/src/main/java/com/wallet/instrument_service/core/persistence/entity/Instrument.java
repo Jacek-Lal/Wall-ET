@@ -56,7 +56,7 @@ public class Instrument {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    Instrument(String ticker, String name, Market market, String primaryExchange, String currencySymbol,
+    public Instrument(String ticker, String name, Market market, String primaryExchange, String currencySymbol,
                       String baseCurrencySymbol, InstrumentType type, String cik) {
         this.ticker = ticker;
         this.name = name;

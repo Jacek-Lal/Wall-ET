@@ -4,18 +4,22 @@ import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import com.wallet.instrument_service.core.service.InstrumentImportService;
 import com.wallet.instrument_service.core.service.InstrumentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/instruments")
@@ -37,17 +41,19 @@ public class InstrumentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<InstrumentRequest>> getAllInstruments() {
-        List<InstrumentRequest> instruments = instrumentService.getAllInstruments();
-        return ResponseEntity.ok(instruments);
+    public ResponseEntity<Page<InstrumentResponse>> getAllInstruments(
+            @PageableDefault(size = 50, sort = "ticker", direction = Sort.Direction.ASC) Pageable pageable) {
+
+        return ResponseEntity.ok(instrumentService.getInstruments(pageable));
     }
 
     @PostMapping("/import")
-    public ResponseEntity<Void> fetchInstruments(@RequestParam SortBy sort,
+    public ResponseEntity<Void> fetchInstruments(@RequestParam Market market,
+                                                 @RequestParam SortBy sort,
                                                  @RequestParam OrderDir order,
                                                  @RequestParam @Min(1) @Max(1000) int limit){
 
-        importService.fetchInstruments(sort, order, limit);
+        importService.fetchInstruments(market, sort, order, limit);
         return ResponseEntity.ok().build();
     }
 

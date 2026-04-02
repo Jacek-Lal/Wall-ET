@@ -25,9 +25,13 @@ public class InstrumentSyncWriter {
 
         int inserted = upsertIgnoreDuplicates(instruments);
 
+        if (newState.getNextUrl() == null)
+            return inserted;
+
         syncStateRepository.save(newState);
-        log.info("Sync state saved: sort = {}, order = {}, nextUrl = {}",
-                newState.getSortBy(), newState.getSortDir(), newState.getNextUrl());
+
+        log.info("Sync state saved: market = {}, sort = {}, order = {}, nextUrl = {}",
+                newState.getMarket(), newState.getSortBy(), newState.getOrderDir(), newState.getNextUrl());
 
         return inserted;
     }

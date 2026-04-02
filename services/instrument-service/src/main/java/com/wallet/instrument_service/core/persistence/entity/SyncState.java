@@ -1,8 +1,14 @@
 package com.wallet.instrument_service.core.persistence.entity;
 
+import com.wallet.instrument_service.core.api.enums.OrderDir;
+import com.wallet.instrument_service.core.api.enums.SortBy;
+import com.wallet.instrument_service.core.persistence.enums.Market;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "instrument_sync_state")
@@ -16,18 +22,29 @@ public class SyncState {
     @Column(nullable = false)
     private Integer items;
 
-    @Column(nullable = false, name = "sort_dir")
-    private String sortDir;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Market market;
 
-    @Column(nullable = false, name = "sort_by")
-    private String sortBy;
+    @Column(name = "order_dir", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderDir orderDir;
 
-    @Column(nullable = false, unique = true, name = "next_url")
+    @Column( name = "sort_by", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SortBy sortBy;
+
+    @Column(name = "next_url", nullable = false, unique = true)
     private String nextUrl;
 
-    public SyncState(int items, String sortDir, String sortBy, String nextUrl){
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    public SyncState(int items, Market market, OrderDir orderDir, SortBy sortBy, String nextUrl){
         this.items = items;
-        this.sortDir = sortDir;
+        this.market = market;
+        this.orderDir = orderDir;
         this.sortBy = sortBy;
         this.nextUrl = nextUrl;
     }
