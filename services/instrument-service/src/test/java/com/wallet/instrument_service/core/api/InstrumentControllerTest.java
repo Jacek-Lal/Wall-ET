@@ -5,7 +5,7 @@ import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
-import com.wallet.instrument_service.core.config.TickerClientConfig;
+import com.wallet.instrument_service.core.integration.config.TickerClientConfig;
 import com.wallet.instrument_service.core.persistence.enums.InstrumentType;
 import com.wallet.instrument_service.core.persistence.enums.Market;
 import com.wallet.instrument_service.core.service.InstrumentImportService;

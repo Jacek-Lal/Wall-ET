@@ -1,4 +1,4 @@
-package com.wallet.instrument_service.core.config;
+package com.wallet.instrument_service.core.integration.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
