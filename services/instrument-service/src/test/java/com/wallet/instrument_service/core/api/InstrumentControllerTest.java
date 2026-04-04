@@ -176,12 +176,12 @@ public class InstrumentControllerTest {
             verify(importService, times(1)).fetchInstruments(market, sort, order, limit);
         }
 
-        @ParameterizedTest(name = "invalid param: {3}")
+        @ParameterizedTest(name = "invalid param: {4}")
         @MethodSource("invalidParams")
         @DisplayName("Should return 400 Bad Request when invalid parameters and never call import service")
-        void shouldReturnBadRequestWhenInvalidParameters(String sort, String order, int limit, String param) throws Exception {
+        void shouldReturnBadRequestWhenInvalidParameters(String market, String sort, String order, int limit, String param) throws Exception {
             mockMvc.perform(post("/api/instruments/import")
-                            .queryParam("market", Market.STOCKS.name())
+                            .queryParam("market", market)
                             .queryParam("sort", sort)
                             .queryParam("order", order)
                             .queryParam("limit", String.valueOf(limit)))
@@ -190,14 +190,13 @@ public class InstrumentControllerTest {
             verifyNoInteractions(importService);
         }
 
-        static Stream<Arguments> invalidParams(){
+        static Stream<Arguments> invalidParams() {
             return Stream.of(
-                    Arguments.of("", "asc", 1000, "ticker blank"),
-                    Arguments.of("ticke", "asc", 1000, "ticker invalid"),
-                    Arguments.of("ticker", "", 1000, "order blank"),
-                    Arguments.of("ticker", "qwe", 1000, "order invalid"),
-                    Arguments.of("ticker", "asc", 0, "limit too low"),
-                    Arguments.of("ticker", "asc", 1001, "limit too high")
+                    Arguments.of("INVALID", "TICKER", "ASC", 100, "market invalid"),
+                    Arguments.of("STOCKS", "INVALID", "ASC", 100, "sort invalid"),
+                    Arguments.of("STOCKS", "TICKER", "INVALID", 100, "order invalid"),
+                    Arguments.of("STOCKS", "TICKER", "ASC", 0, "limit too low"),
+                    Arguments.of("STOCKS", "TICKER", "ASC", 1001, "limit too high")
             );
         }
     }
