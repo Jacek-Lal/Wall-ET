@@ -48,10 +48,10 @@ public class InstrumentController {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<Void> fetchInstruments(@RequestParam Market market,
-                                                 @RequestParam SortBy sort,
-                                                 @RequestParam OrderDir order,
-                                                 @RequestParam @Min(1) @Max(1000) int limit){
+    public ResponseEntity<Void> fetchInstruments(@RequestParam(defaultValue = "STOCKS") Market market,
+                                                 @RequestParam(defaultValue = "TICKER") SortBy sort,
+                                                 @RequestParam(defaultValue = "ASC") OrderDir order,
+                                                 @RequestParam(defaultValue = "100") @Min(1) @Max(1000) int limit){
 
         importService.fetchInstruments(market, sort, order, limit);
         return ResponseEntity.ok().build();
