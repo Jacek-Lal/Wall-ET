@@ -46,7 +46,7 @@ class InstrumentCrudIT {
     void shouldCreateThenReturnAllInstruments_whenRequestValid() {
         InstrumentRequest req = new InstrumentRequest(
                 "AAPL", "Apple Inc.", Market.STOCKS, "XNYS",
-                "USD", null, InstrumentType.CS, "100300400"
+                "USD", null, InstrumentType.CS, "1003004000"
         );
 
         InstrumentResponse response = client.post()
@@ -64,7 +64,7 @@ class InstrumentCrudIT {
 
         InstrumentResponse expected = new InstrumentResponse(null, "AAPL", "Apple Inc.",
                 Market.STOCKS, "XNYS", "USD", null, InstrumentType.CS,
-                "100300400", null
+                "1003004000", null
         );
         assertThat(response).isNotNull();
         assertThat(response)
@@ -98,9 +98,9 @@ class InstrumentCrudIT {
     @DisplayName("Should delete all instruments")
     void shouldDeleteAllInstruments() {
         InstrumentRequest req1 = new InstrumentRequest("AAPL", "Apple Inc.", Market.STOCKS,
-                "XNYS", "USD", null, InstrumentType.CS, "100300400");
+                "XNYS", "USD", null, InstrumentType.CS, "1003004000");
         InstrumentRequest req2 = new InstrumentRequest("MSFT", "Microsoft", Market.STOCKS,
-                "XNYS", "USD", null, InstrumentType.CS, "123456789");
+                "XNYS", "USD", null, InstrumentType.CS, "1234567890");
 
         client.post().uri("/api/instruments").contentType(MediaType.APPLICATION_JSON).body(req1).exchange().expectStatus().isCreated();
         client.post().uri("/api/instruments").contentType(MediaType.APPLICATION_JSON).body(req2).exchange().expectStatus().isCreated();

@@ -61,10 +61,10 @@ public class InstrumentControllerTest {
         List<InstrumentResponse> instruments = List.of(
                 new InstrumentResponse(1L,"AAPL", "Apple Inc.", Market.STOCKS,
                         "XNYS", "USD",null,
-                        InstrumentType.CS, "100300400", Instant.now()),
+                        InstrumentType.CS, "1003004000", Instant.now()),
                 new InstrumentResponse(2L,"A", "Agilent Technologies Inc.", Market.STOCKS,
                         "XNYS","USD",null,
-                        InstrumentType.CS, "2010401", Instant.now())
+                        InstrumentType.CS, "0002010401", Instant.now())
         );
         Page<InstrumentResponse> page = new PageImpl<>(instruments);
 
@@ -104,13 +104,13 @@ public class InstrumentControllerTest {
                             "primary_exchange": "XNYS",
                             "currency_symbol": "USD",
                             "type": "CS",
-                            "cik": "100300400"
+                            "cik": "1003004000"
                         }
                     """;
 
             InstrumentResponse response = new InstrumentResponse(1L, "AAPL", "Apple Inc.",
                     Market.STOCKS, "XNYS", "USD", "US",
-                    InstrumentType.CS, "100300400", Instant.parse("2026-01-25T18:35:24.00Z"));
+                    InstrumentType.CS, "1003004000", Instant.parse("2026-01-25T18:35:24.00Z"));
 
             when(instrumentService.createInstrument(any())).thenReturn(response);
 
@@ -142,7 +142,7 @@ public class InstrumentControllerTest {
         static Stream<Arguments> invalidRequests() {
             InstrumentRequest base = new InstrumentRequest(
                     "AAPL", "Apple Inc.", Market.STOCKS, "XNYS", "USD",
-                    null, InstrumentType.CS, "100300400");
+                    null, InstrumentType.CS, "1003004000");
 
             return Stream.of(
                     Arguments.of(new InstrumentRequest("", base.name(), base.market(), base.primaryExchange(), base.currencySymbol(), base.baseCurrencySymbol(), base.type(), base.cik()), "ticker"),
