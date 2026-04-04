@@ -10,6 +10,7 @@ import com.wallet.instrument_service.core.service.InstrumentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/instruments")
@@ -45,6 +47,12 @@ public class InstrumentController {
             @PageableDefault(size = 50, sort = "ticker", direction = Sort.Direction.ASC) Pageable pageable) {
 
         return ResponseEntity.ok(instrumentService.getInstruments(pageable));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<InstrumentResponse>> search(
+            @RequestParam @NotBlank String query) {
+        return ResponseEntity.ok(instrumentService.search(query));
     }
 
     @PostMapping("/import")
