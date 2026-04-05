@@ -1,6 +1,7 @@
 package com.wallet.instrument_service.integration;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.wallet.instrument_service.config.TestcontainersConfig;
 import com.wallet.instrument_service.core.api.enums.OrderDir;
 import com.wallet.instrument_service.core.api.enums.SortBy;
 import com.wallet.instrument_service.core.persistence.entity.Instrument;
@@ -30,7 +31,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
 @Import(TestcontainersConfig.class)
-@ActiveProfiles("test")
 class InstrumentImportIT {
 
     @RegisterExtension

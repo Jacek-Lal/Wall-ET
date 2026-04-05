@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 CREATE TABLE instrument (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ticker TEXT NOT NULL UNIQUE,
@@ -11,14 +13,8 @@ CREATE TABLE instrument (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX ux_instrument_exchange_ticker
-  ON instrument (primary_exchange, lower(ticker));
-
-CREATE INDEX ix_instrument_ticker_lower
-  ON instrument (lower(ticker));
-
-CREATE INDEX ix_instrument_name_lower
-  ON instrument (lower(name));
+CREATE INDEX ix_instrument_ticker_trgm ON instrument USING GIST(ticker gist_trgm_ops(siglen=64));
+CREATE INDEX ix_instrument_name_trgm ON instrument USING GIST(name gist_trgm_ops(siglen=64));
 
 CREATE TABLE instrument_sync_state (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

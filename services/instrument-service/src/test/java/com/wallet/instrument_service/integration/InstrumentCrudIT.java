@@ -1,5 +1,6 @@
 package com.wallet.instrument_service.integration;
 
+import com.wallet.instrument_service.config.TestcontainersConfig;
 import com.wallet.instrument_service.core.api.dto.InstrumentRequest;
 import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.persistence.enums.InstrumentType;

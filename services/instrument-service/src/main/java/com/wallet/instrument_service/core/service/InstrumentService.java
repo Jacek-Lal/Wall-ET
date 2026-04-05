@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
@@ -28,6 +30,14 @@ public class InstrumentService {
 
     public Page<InstrumentResponse> getInstruments(Pageable pageable) {
         return instrumentRepository.findAll(pageable).map(instrumentMapper::toResponse);
+    }
+
+    public List<InstrumentResponse> search(String query) {
+        if (query == null || query.isBlank()) return List.of();
+        return instrumentRepository.search(query.trim())
+                .stream()
+                .map(instrumentMapper::toResponse)
+                .toList();
     }
 
     public void deleteInstruments() {
