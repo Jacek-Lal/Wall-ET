@@ -17,6 +17,14 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> resourceNotFoundHandler(ResourceNotFoundException e){
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        String message = "Resource not found";
+        ErrorResponse response = new ErrorResponse(status.value(), message, Instant.now());
+        return ResponseEntity.status(status).body(response);
+    }
+
     @ExceptionHandler(value = NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoStaticResourceFound(NoResourceFoundException e){
         HttpStatus status = HttpStatus.NOT_FOUND;
