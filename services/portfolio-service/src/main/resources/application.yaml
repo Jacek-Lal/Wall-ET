@@ -23,3 +23,7 @@ management:
     web:
       exposure:
         include: health,info
+
+app:
+  instrument-service:
+    base-url: "http://localhost:8081"
