@@ -81,6 +81,21 @@ public class InstrumentControllerTest {
     }
 
     @Test
+    @DisplayName("Should return 200 and instrument details")
+    void shouldReturnInstrumentResponse() throws Exception {
+        InstrumentResponse response = new InstrumentResponse(1L,"AAPL", "Apple Inc.", Market.STOCKS,
+                "XNYS", "USD",null,
+                InstrumentType.CS, "1003004000", Instant.now());
+
+        when(instrumentService.getInstrument(anyString())).thenReturn(response);
+
+        mockMvc.perform(get("/api/instruments/{ticker}", "AAPL"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.ticker").value("AAPL"));
+    }
+
+    @Test
     @DisplayName("Should return 200 and call delete on service")
     void shouldDeleteAllInstruments() throws Exception {
         mockMvc.perform(delete("/api/instruments"))

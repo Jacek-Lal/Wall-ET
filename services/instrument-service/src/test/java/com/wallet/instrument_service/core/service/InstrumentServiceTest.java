@@ -7,6 +7,7 @@ import com.wallet.instrument_service.core.persistence.entity.Instrument;
 import com.wallet.instrument_service.core.persistence.enums.InstrumentType;
 import com.wallet.instrument_service.core.persistence.enums.Market;
 import com.wallet.instrument_service.core.persistence.repo.InstrumentRepository;
+import com.wallet.instrument_service.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,9 +20,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +90,14 @@ class InstrumentServiceTest {
         assertThat(result.getContent().get(1).ticker()).isEqualTo("BBB");
 
         verify(instrumentRepository).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("getInstrument should throw ResourceNotFoundException when Optional is empty")
+    void shouldThrow_whenOptionalEmpty(){
+        when(instrumentRepository.findByTicker(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> instrumentService.getInstrument("AAPL"));
     }
 
     @Test
