@@ -42,6 +42,11 @@ public class InstrumentController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @GetMapping("/{ticker}")
+    public ResponseEntity<InstrumentResponse> getInstrument(@PathVariable @NotBlank String ticker){
+        return ResponseEntity.ok(instrumentService.getInstrument(ticker));
+    }
+
     @GetMapping
     public ResponseEntity<Page<InstrumentResponse>> getAllInstruments(
             @PageableDefault(size = 50, sort = "ticker", direction = Sort.Direction.ASC) Pageable pageable) {

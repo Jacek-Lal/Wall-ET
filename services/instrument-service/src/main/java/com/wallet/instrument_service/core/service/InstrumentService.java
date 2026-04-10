@@ -5,6 +5,7 @@ import com.wallet.instrument_service.core.api.dto.InstrumentResponse;
 import com.wallet.instrument_service.core.mapper.InstrumentMapper;
 import com.wallet.instrument_service.core.persistence.entity.Instrument;
 import com.wallet.instrument_service.core.persistence.repo.InstrumentRepository;
+import com.wallet.instrument_service.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,14 @@ public class InstrumentService {
 
     public InstrumentResponse createInstrument(InstrumentRequest request) {
         Instrument instrument = instrumentRepository.save(instrumentMapper.toEntity(request));
+        return instrumentMapper.toResponse(instrument);
+    }
+
+    public InstrumentResponse getInstrument(String ticker){
+        Instrument instrument = instrumentRepository.findByTicker(ticker).orElseThrow(() ->
+                new ResourceNotFoundException("Instrument with ticker %s does not exist".formatted(ticker))
+        );
+
         return instrumentMapper.toResponse(instrument);
     }
 

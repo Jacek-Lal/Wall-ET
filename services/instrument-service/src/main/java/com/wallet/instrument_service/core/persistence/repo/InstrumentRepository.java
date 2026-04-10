@@ -7,9 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InstrumentRepository extends JpaRepository<Instrument, Long> {
+    Optional<Instrument> findByTicker(String ticker);
+
     @Query(value = """
             SELECT * FROM instrument
             WHERE :query <% ticker OR :query <% name
