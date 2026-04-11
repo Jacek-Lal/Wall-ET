@@ -50,9 +50,7 @@ public class PortfolioService {
                 new ResourceNotFoundException("Portfolio with id " + id + " does not exist")
         );
 
-        portfolio.setName(request.name());
-        portfolio.setBaseCurrency(request.baseCurrency());
-
+        portfolioMapper.updateEntity(request, portfolio);
         Portfolio updated = portfolioRepository.save(portfolio);
 
         return portfolioMapper.toResponse(updated);
